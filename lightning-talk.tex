@@ -75,11 +75,20 @@
 % Making a DAG
 \usepackage{tkz-graph}  
 \usetikzlibrary{shapes.geometric}
-\tikzstyle{VertexStyle} = [shape            = ellipse,
+\usetikzlibrary{positioning}
+\tikzstyle{VertexStyle} = [shape            = rectangle,
                                minimum width    = 6ex,%
                                draw]
  \tikzstyle{EdgeStyle}   = [->,>=stealth']      
 
+% Define block styles
+\tikzstyle{f} = [rectangle, draw, fill=blue!20, 
+    text width=3em, text badly centered, node distance=1.75cm]
+\tikzstyle{message} = [rectangle, draw, fill=green!20, 
+    text width=3em, text centered]
+\tikzstyle{io} = [draw, circle,fill=red!20, node distance=2cm,
+    minimum height=2em]
+\tikzstyle{line} = [draw, -latex']
 
 % Math macros
 \newcommand{\cD}{{\mathcal D}}
@@ -128,11 +137,149 @@
 \section[Introduction]{Introduction}
 \frame
 {
-  \frametitle{}
+  \frametitle{PRNGs}
+  
+If you use a computer to do random sampling (including permutation tests, bootstrapping, MCMC, basically any kind of simulation), you use prngs.
 \begin{center}
 \begin{itemize}
+\item \textbf{Pseudorandom}: computationally indistinguishable from the uniform distribution
+\item other desirable properties
 \end{itemize}
 \end{center}
+}
+
+
+
+\frame{
+\frametitle{The good, the bad, and the ugly}
+\begin{block}{\citet{knuth_art_1997}}
+``Random numbers should not be generated with a method chosen at random.''
+\end{block}
+
+\vspace{15pt}
+\textbf{RANDU}: the sequence $(x_n)$ given by
+
+$$x_{n+1} = (65539 x_{n}) \mod 2^{31}.$$
+\vspace{10pt}
+
+\footnotesize{$0.003051898, 0.018310966, 0.082398718, 0.329593616, 0.235973230,...$}
+\pause
+
+\small
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width = 0.4\textwidth]{randu.png}
+\end{center}
+     Triples of RANDU lie on 15 planes in 3D space \small{(Wikipedia)}
+\end{figure}
+}
+
+\frame{
+\frametitle{Pigeons and Pigeonholes}
+
+\begin{theorem}[Pigeonhole Principle]
+If there are $n$ pigeonholes and $m>n$ pigeons, then there exists at least one pigeonhole containing more than one pigeon.
+\end{theorem}
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width = .3\textwidth]{TooManyPigeons.jpg}
+\end{center}
+\tiny \href{https://commons.wikimedia.org/w/index.php?curid=4658682}{(Wikipedia)}
+\end{figure}
+
+\pause
+\begin{corollary}[Too few pigeons]
+If ${n \choose k}$ is greater than the size of a PRNG's state space, then the PRNG cannot possibly generate all samples of size $k$ from a population of $n$.
+\end{corollary}
+}
+
+
+\frame{
+\frametitle{Pigeons and Pigeonholes}
+
+How much does it matter? 
+\pause
+
+\vspace{20pt}
+
+Period of 32-bit linear congruential generators (e.g. RANDU): $2^{32} \approx 4 \times 10^9$ \\
+Samples of size $10$ from $50$: ${50 \choose 10} \approx 10^{10}$ \\
+\vspace{20pt}
+\pause
+
+Period of Mersenne Twister (standard PRNG in Statistics): $2^{32 \times 624} \approx 2 \times 10^{6010}$ \\
+Permutations of $2084$ objects: $2084! \approx 3 \times 10^{6013}$
+
+
+}
+
+
+\frame{
+\frametitle{A better alternative}
+
+\textbf{Solution:} Find a class of PRNGs with infinite state space!
+
+
+\begin{center}
+\resizebox{10cm}{!}{    
+\begin{tikzpicture}[node distance = 1cm, auto, scale = 0.5]
+    % Place nodes
+    \node [io] (IV) {IV};
+    \node [f, right of=IV] (f1) {f};
+    \node [f, right of=f1] (f2) {f};
+%    \node [f, right of=f2, minimum width = 0cm, height = 0cm] (invisible) {};
+    \node [f, right of=f2, node distance=3cm] (fn1) {f};
+    \node [f, right of=fn1] (fend) {f};
+%    \node [f, right of=invisible, node distance=3cm] (fend) {f};
+    \node [f, right of=fend] (g) {g};
+    \node [io, right of=g] (hx) {$h(x)$};
+    \node [message, above of=f1] (m1) {$x_1$};
+    \node [message, above of=f2] (m2) {$x_2$};
+    \node [message, above of=fn1] (mn1) {$x_{n-1}$};
+    \node [message, above of=fend] (mend) {$x_n$};
+    \node [message, above right = of m1, above left = of mend, minimum width = 5cm] (message) {$x$};
+    % Draw edges
+    \path [line] (IV) -- (f1);
+    \path [line] (f1) -- (f2);
+    \path [line] (message) -- (m1);
+    \path [line] (message) -- (m2);
+    \path [line] (message) -- (mn1);
+    \path [line] (message) -- (mend);
+    \draw [-,dotted] (m2) -- (mn1);
+    \path [line] (m1) -- (f1);
+    \path [line] (m2) -- (f2);
+     \path [line] (mn1) -- (fn1);
+    \path [line] (mend) -- (fend);
+    \path [line] (fend) -- (g);
+    \path [line,dashed] (f2) -- (fn1);
+    \path [line] (fn1) -- (fend);
+    \path [line] (g) -- (hx);
+\end{tikzpicture}
+}
+\end{center}
+
+
+Cryptographic hash functions:
+\begin{itemize}
+\item computationally infeasible to invert
+\item difficult to find two inputs that map to the same output
+\item small input changes produce large, unpredictable changes to output
+\item resulting bits are uniformly distributed
+\end{itemize}
+
+}
+
+\frame{
+\frametitle{Open questions}
+\begin{itemize}
+\itemsep10pt
+\item Sampling algorithms: do some give samples with unequal probability?
+\item For PRNGs with sufficiently large state space, do they produce all samples with equal probability? All permutations?
+\item Are departures from uniformity large enough to bias statistics of interest?
+\item Replace the default PRNGs in Python
+\url{https://www.github.com/statlab/cryptorandom}
+\end{itemize}
+
 }
 
 \begin{frame}
