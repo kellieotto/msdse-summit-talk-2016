@@ -122,10 +122,10 @@
 
 \mode<presentation>
 
-\title[Simple Random Sampling: Not So Simple]{Simple Random Sampling: Not So Simple \\ MSDSE 2016}
+\title[Simple Random Sampling: Not So Simple]{Simple Random Sampling: Not So Simple}
 \author{Kellie Ottoboni \\ with Philip B.~Stark and Ron Rivest}
 \institute[]{Department of Statistics, UC Berkeley\\Berkeley Institute for Data Science}
-\date{October 24, 2016}
+\date{Moore-Sloan DSE Summit \\ October 24, 2016}
 
 \begin{document}
 
@@ -139,13 +139,16 @@
 {
   \frametitle{PRNGs}
   
-If you use a computer to do random sampling (including permutation tests, bootstrapping, MCMC, basically any kind of simulation), you use prngs.
 \begin{center}
 \begin{itemize}
+\item \textbf{Simple random sampling:} drawing $k \le n$ items from a population of $n$ items, in such a way that each of the $n \choose k$ subsets of size $k$ is equally likely.
+\item Difficult to obtain truly random samples. Instead, use \textbf{pseudorandom number generators (PRNGs)} to select items
 \item \textbf{Pseudorandom}: computationally indistinguishable from the uniform distribution
-\item other desirable properties
 \end{itemize}
 \end{center}
+
+Good PRNGs produce pseudorandom sequences. Do they give simple random samples with equal probabilities?
+
 }
 
 
@@ -197,18 +200,20 @@ If ${n \choose k}$ is greater than the size of a PRNG's state space, then the PR
 \frame{
 \frametitle{Pigeons and Pigeonholes}
 
-How much does it matter? 
+Does it matter in practice? 
 \pause
 
 \vspace{20pt}
 
 Period of 32-bit linear congruential generators (e.g. RANDU): $2^{32} \approx 4 \times 10^9$ \\
 Samples of size $10$ from $50$: ${50 \choose 10} \approx 10^{10}$ \\
+\textbf{More than half of samples cannot be generated}
 \vspace{20pt}
 \pause
 
 Period of Mersenne Twister (standard PRNG in Statistics): $2^{32 \times 624} \approx 2 \times 10^{6010}$ \\
-Permutations of $2084$ objects: $2084! \approx 3 \times 10^{6013}$
+Permutations of $2084$ objects: $2084! \approx 3 \times 10^{6013}$\\
+\textbf{Less than $0.01\%$ of permutations can be generated}
 
 
 }
@@ -217,7 +222,7 @@ Permutations of $2084$ objects: $2084! \approx 3 \times 10^{6013}$
 \frame{
 \frametitle{A better alternative}
 
-\textbf{Solution:} Find a class of PRNGs with infinite state space!
+\textbf{One solution:} Find a class of PRNGs with infinite state space
 
 
 \begin{center}
@@ -269,6 +274,34 @@ Cryptographic hash functions:
 
 }
 
+
+\frame{
+\frametitle{Choice of seed}
+
+Preliminary results: the distribution of simple random samples is less uniform if you use a stupid seed
+
+\begin{table}[htdp]
+\begin{center}
+\begin{tabular}{r|c|c|}
+ & $p$-value& $p$-value\\
+PRNG &  (seed = 100) &  (seed = 233424280) \\
+\hline
+RANDU & 0  & 0 \\
+Super-Duper LCG & 0.1798 & 1 \\
+Mersenne Twister*  & 0.0858 & 0.4741 \\
+Mersenne Twister & 0.1996 & 0.6143 \\
+SHA-256 PRNG & 0.1710 & 0.8584
+\end{tabular}
+\end{center}
+\label{default}
+\end{table}%
+
+\small{* using \texttt{np.random.choice} to sample}
+
+}
+
+
+
 \frame{
 \frametitle{Open questions}
 \begin{itemize}
@@ -278,6 +311,8 @@ Cryptographic hash functions:
 \item Are departures from uniformity large enough to bias statistics of interest?
 \item Replace the default PRNGs in Python
 \url{https://www.github.com/statlab/cryptorandom}
+\item Results apply more broadly to computer simulations: permutation tests, bootstrapping, MCMC, etc.
+
 \end{itemize}
 
 }
