@@ -125,12 +125,31 @@
 \title[Simple Random Sampling: Not So Simple]{Simple Random Sampling: Not So Simple}
 \author{Kellie Ottoboni \\ with Philip B.~Stark and Ron Rivest}
 \institute[]{Department of Statistics, UC Berkeley\\Berkeley Institute for Data Science}
-\date{Moore-Sloan DSE Summit \\ October 24, 2016}
+\date{Moore-Sloan Data Science Summit \\ October 24, 2016}
 
 \begin{document}
 
-\frame{\titlepage}
-
+\frame{
+\titlepage
+\vfill
+\begin{columns}[T]
+\begin{column}{.5\textwidth}
+\begin{center}
+\vspace{25pt}
+\includegraphics[width=\textwidth]{fig/logo/dept1.pdf}
+\end{center}
+\end{column}
+\begin{column}{.3\textwidth}
+\begin{center}
+\end{center}
+\end{column}
+\begin{column}{.3\textwidth}
+\begin{center}
+\includegraphics[width=0.9\textwidth]{fig/logo/BIDS.png}
+\end{center}
+\end{column}
+\end{columns}
+}
 
 
 
@@ -139,42 +158,17 @@
 {
   \frametitle{PRNGs}
   
-\begin{center}
-\begin{itemize}
-\item \textbf{Simple random sampling:} drawing $k \le n$ items from a population of $n$ items, in such a way that each of the $n \choose k$ subsets of size $k$ is equally likely.
-\item Difficult to obtain truly random samples. Instead, use \textbf{pseudorandom number generators (PRNGs)} to select items
-\item \textbf{Pseudorandom}: computationally indistinguishable from the uniform distribution
-\end{itemize}
-\end{center}
+  \textbf{Pseudorandom number generator:} a deterministic algorithm that produces sequences that are computationally indistinguishable from the uniform distribution
+%\begin{center}
+%\begin{itemize}
+%\item \textbf{Simple random sampling:} drawing $k \le n$ items from a population of $n$ items, in such a way that each of the $n \choose k$ subsets of size $k$ is equally likely.
+%\item Difficult to obtain truly random samples. Instead, use \textbf{pseudorandom number generators (PRNGs)} to select items
+%\item \textbf{Pseudorandom}: computationally indistinguishable from the uniform distribution
+%\end{itemize}
+%\end{center}
+%
+%Good PRNGs produce pseudorandom sequences. Do they give simple random samples with equal probabilities?
 
-Good PRNGs produce pseudorandom sequences. Do they give simple random samples with equal probabilities?
-
-}
-
-
-
-\frame{
-\frametitle{The good, the bad, and the ugly}
-\begin{block}{\citet{knuth_art_1997}}
-``Random numbers should not be generated with a method chosen at random.''
-\end{block}
-
-\vspace{15pt}
-\textbf{RANDU}: the sequence $(x_n)$ given by
-
-$$x_{n+1} = (65539 x_{n}) \mod 2^{31}.$$
-\vspace{10pt}
-
-\footnotesize{$0.003051898, 0.018310966, 0.082398718, 0.329593616, 0.235973230,...$}
-\pause
-
-\small
-\begin{figure}[htbp]
-\begin{center}
-\includegraphics[width = 0.4\textwidth]{randu.png}
-\end{center}
-     Triples of RANDU lie on 15 planes in 3D space \small{(Wikipedia)}
-\end{figure}
 }
 
 \frame{
@@ -185,7 +179,7 @@ If there are $n$ pigeonholes and $m>n$ pigeons, then there exists at least one p
 \end{theorem}
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics[width = .3\textwidth]{TooManyPigeons.jpg}
+\includegraphics[width = .3\textwidth]{fig/TooManyPigeons.jpg}
 \end{center}
 \tiny \href{https://commons.wikimedia.org/w/index.php?curid=4658682}{(Wikipedia)}
 \end{figure}
@@ -216,6 +210,26 @@ Permutations of $2084$ objects: $2084! \approx 3 \times 10^{6013}$\\
 \textbf{Less than $0.01\%$ of permutations can be generated}
 
 
+}
+
+
+
+\frame{
+\frametitle{The good, the bad, and the ugly}
+\begin{block}{(Knuth, 1997)}
+``Random numbers should not be generated with a method chosen at random.''
+\end{block}
+\pause
+
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width = 0.4\textwidth]{fig/randu.png}
+\end{center}
+     Triples of RANDU lie on 15 planes in 3D space \\ 
+     $x_{n+1} = (65539 x_{n}) \mod 2^{31}$ \\
+\footnotesize{(Wikipedia)}
+\end{figure}
 }
 
 
@@ -306,23 +320,27 @@ SHA-256 PRNG & 0.1710 & 0.8584
 \frametitle{Open questions}
 \begin{itemize}
 \itemsep10pt
-\item Sampling algorithms: do some give samples with unequal probability?
-\item For PRNGs with sufficiently large state space, do they produce all samples with equal probability? All permutations?
-\item Are departures from uniformity large enough to bias statistics of interest?
+\item Do ``good'' PRNGs produce all samples with equal probability? All permutations?
+\pause
+\item Do departures from uniformity introduce bias?
+\pause
 \item Replace the default PRNGs in Python
 \url{https://www.github.com/statlab/cryptorandom}
+\pause
 \item Results apply more broadly to computer simulations: permutation tests, bootstrapping, MCMC, etc.
-
 \end{itemize}
 
 }
 
 \begin{frame}
-\frametitle{References}
-\tiny
-\bibliographystyle{plainnat}
-\bibliography{refs}
-\itemize
+\frametitle{}
+\begin{center}
+\huge Thanks!
+\vspace{20pt}
+
+\normalsize
+\url{https://github.com/kellieotto/msdse-summit-talk-2016}
+\end{center}
 \end{frame}
 
 
